@@ -15,6 +15,7 @@ npm run dev
 
 - [Installation](#installation)
 - [Environment Configuration](#environment-configuration)
+- [Docker](#docker)
 - [Running WebAdmin](#running-webadmin)
 - [Production Build](#production-build)
 - [Troubleshooting](#troubleshooting)
@@ -50,6 +51,43 @@ npm install
 
    - Same machine: `http://localhost:49664`
    - Different machine: `http://192.168.1.100:49664` (replace with actual IP)
+
+---
+
+## Docker
+
+The Docker setup serves the built app with Nginx and injects `VITE_API_BASE_URL` at container startup, so you can point the frontend to a different backend without rebuilding the image.
+
+### Docker Compose
+
+```bash
+cd ..
+docker compose up --build -d
+```
+
+Default URL: `http://localhost`
+
+There is no standalone compose file inside `WebAdmin` anymore. Use the root [`docker-compose.yml`](../docker-compose.yml) to run the full stack, or use `docker build` / `docker run` below if you only want the frontend image.
+
+### Docker Build and Run
+
+```bash
+cd WebAdmin
+docker build -t webadmin .
+docker run -d \
+  --name webadmin \
+  -p 5173:80 \
+  -e VITE_API_BASE_URL=http://YOUR_SERVER_IP:49664 \
+  webadmin
+```
+
+### Runtime Environment Variable
+
+Set `VITE_API_BASE_URL` to the browser-reachable backend URL, for example:
+
+- Same machine: `http://localhost:49664`
+- Different machine: `http://192.168.1.100:49664`
+- Reverse proxy/domain: `https://api.yourdomain.com`
 
 ---
 
@@ -203,4 +241,3 @@ pm2 start ecosystem.config.cjs --only webadmin-dev --env development
 ---
 
 For more details, see the [main README](../README.md).
-
